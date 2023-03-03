@@ -147,6 +147,36 @@ export default {
       access = 'root';
       return;
     }
+    //技术部负责人 engineer
+    if (password === '123' && username === 'engineer') {
+      res.send({
+        status: 'ok',
+        type,
+        currentAuthority: 'engineer',
+      });
+      access = 'engineer';
+      return;
+    }
+    //销售部负责人 sale
+    if (password === '123' && username === 'sale') {
+      res.send({
+        status: 'ok',
+        type,
+        currentAuthority: 'sale',
+      });
+      access = 'sale';
+      return;
+    }
+    //商务部负责人 business
+    if (password === '123' && username === 'business') {
+      res.send({
+        status: 'ok',
+        type,
+        currentAuthority: 'business',
+      });
+      access = 'business';
+      return;
+    }
     if (type === 'mobile') {
       res.send({
         status: 'ok',

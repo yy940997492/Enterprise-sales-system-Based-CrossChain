@@ -95,6 +95,34 @@ export default defineConfig({
       ],
     },
     {
+      name: '您的工作流程',
+      icon: 'warning',
+      path: '/showFlowChart',
+      routes: [
+        {
+          name: '技术部门',
+          icon: 'smile',
+          path: '/showFlowChart/engineer',
+          component: './showFlowChart/engineer',
+          access: 'canEngineer',
+        },
+        {
+          name: '销售',
+          icon: 'smile',
+          path: '/showFlowChart/sale',
+          component: './showFlowChart/sale',
+          access: 'canSale',
+        },
+        {
+          name: '商务部门',
+          icon: 'smile',
+          path: '/showFlowChart/business',
+          component: './showFlowChart/business',
+          access: 'canBusiness',
+        },
+      ],
+    },
+    {
       path: '/form',
       icon: 'form',
       name: 'form',
@@ -307,6 +335,13 @@ export default defineConfig({
           component: './editor/koni',
         },
       ],
+    },
+    {
+      path: '/newpage',
+      name: 'newpage',
+      icon: 'smile',
+      access: 'canRoot',
+      component: './NewPage',
     },
     {
       path: '/',
