@@ -96,7 +96,7 @@ export default defineConfig({
     },
     {
       name: '您的工作流程',
-      icon: 'warning',
+      icon: 'calculator',
       path: '/showFlowChart',
       routes: [
         {
@@ -119,6 +119,20 @@ export default defineConfig({
           path: '/showFlowChart/business',
           component: './showFlowChart/business',
           access: 'canBusiness',
+        },
+      ],
+    },
+    {
+      path: '/sale/customerInformation',
+      icon: 'form',
+      name: '客户信息管理',
+      access: 'canSale',
+      routes: [
+        {
+          name: '录入客户信息',
+          icon: 'smile',
+          path: '/sale/customerInformation/enterCustomerInformation',
+          component: './sale/customerInformation/enterCustomerInformation',
         },
       ],
     },
