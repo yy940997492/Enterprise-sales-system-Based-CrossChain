@@ -8,22 +8,33 @@ import ProForm, {
   ProFormDateTimePicker,
   ProFormDatePicker,
 } from '@ant-design/pro-form';
-import { useRequest } from 'umi';
+//import { useRequest } from 'umi';
 import type { FC } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { fakeSubmitForm } from './service';
 import styles from './style.less';
 
 const BasicForm: FC<Record<string, any>> = () => {
-  const { run } = useRequest(fakeSubmitForm, {
-    manual: true,
-    onSuccess: () => {
-      message.success('提交成功');
-    },
-  });
-
+  // const { run } = useRequest(fakeSubmitForm, {
+  //   manual: true,
+  //   onSuccess: () => {
+  //     message.success('提交成功');
+  //   },
+  // });
+  //
+  // const onFinish = async (values: Record<string, any>) => {
+  //   run(values);
+  // };
   const onFinish = async (values: Record<string, any>) => {
-    run(values);
+    values.stauts = false; //第一次提交基础信息，还未跟进，状态为false
+    console.log(values);
+    fakeSubmitForm(values).then((res) => {
+      if (res.data.message === 'Ok') {
+        message.success('提交成功');
+      } else {
+        message.error('提交失败');
+      }
+    });
   };
 
   return (

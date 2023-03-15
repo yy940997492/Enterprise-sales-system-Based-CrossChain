@@ -4,10 +4,10 @@ const Settings: LayoutSettings & {
   pwa?: boolean;
   logo?: string;
 } = {
-  navTheme: 'light',
+  navTheme: 'realDark',
   primaryColor: '#1890ff',
-  layout: 'mix',
-  contentWidth: 'Fluid',
+  layout: 'top',
+  contentWidth: 'Fixed',
   fixedHeader: false,
   fixSiderbar: true,
   pwa: false,

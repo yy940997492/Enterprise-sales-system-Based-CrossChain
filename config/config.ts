@@ -95,6 +95,12 @@ export default defineConfig({
       ],
     },
     {
+      name: '开发测试',
+      icon: 'smile',
+      path: '/myTest',
+      component: './myTest',
+    },
+    {
       name: '您的工作流程',
       icon: 'calculator',
       path: '/showFlowChart',
@@ -129,10 +135,16 @@ export default defineConfig({
       access: 'canSale',
       routes: [
         {
-          name: '录入客户信息',
+          name: '录入客户基础信息',
           icon: 'smile',
           path: '/sale/customerInformation/enterCustomerInformation',
           component: './sale/customerInformation/enterCustomerInformation',
+        },
+        {
+          name: '跟进客户信息',
+          icon: 'smile',
+          path: '/sale/customerInformation/followUpRecord',
+          component: './/sale/customerInformation/followUpRecord',
         },
       ],
     },
