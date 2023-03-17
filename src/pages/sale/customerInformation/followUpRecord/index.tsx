@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, Radio, message, Card } from 'antd';
-import { fakeSubmitDetialForm } from './service';
+const { Search } = Input;
+import { fakeSubmitDetailForm } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
 
 const CustomerList = () => {
-  const [data, setData] = useState<CustomerBasicInformation[]>([]);
+  const [data, setData] = useState<CustomerBasicInformation[]>([]); //保存完整的相应数据
+  const [searchData, setSearchData] = useState<CustomerBasicInformation[]>([]); //保存查询的数据
   const [open, setOpen] = useState<boolean>(false); //第一个open，控制第一个模态框的显示与隐藏，第一个模态框是用了显示填写详细信息的模态框。
   const [open02, setOpen02] = useState<boolean>(false); //第二个open，控制第二个模态框的显示与隐藏，第二个模态框是用来显示客户全部基础信息的模态框。
   const [detailForm] = Form.useForm();
@@ -78,9 +80,25 @@ const CustomerList = () => {
           weight: 50,
           status: false,
         },
+        {
+          customerID: '3',
+          name: '紫灵',
+          sex: '女',
+          dateTime: '1997-01-01',
+          birthdate: '1999-12-11',
+          address: '乱星海',
+          company: '妙音们',
+          phone: '520025',
+          mail: '9999@qq.com',
+          description: '人界第一美女',
+          sale: '王五',
+          weight: 90,
+          status: false,
+        },
       ],
     };
     setData(res.data);
+    setSearchData(res.data);
   };
 
   //页面刷新时获取客户基础信息列表
@@ -91,6 +109,7 @@ const CustomerList = () => {
   //填写跟进信息，弹出模态框
   const handleEnterDetailModal = (record: CustomerBasicInformation) => {
     //console.log(record);
+    //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
     setBasicInfo(record);
     setOpen(true);
   };
@@ -99,6 +118,7 @@ const CustomerList = () => {
   const handleShowAllBasicInfo = (record: CustomerBasicInformation) => {
     //console.log('rc',record);
     //setBasicInfo(Object.assign({},record));
+    //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
     setBasicInfo(record);
     setOpen02(true);
   };
@@ -112,7 +132,7 @@ const CustomerList = () => {
     //提交详细信息，将status状态变为true
     detail.status = true;
     console.log(detail);
-    fakeSubmitDetialForm(detail).then((res) => {
+    fakeSubmitDetailForm(detail).then((res) => {
       if (res.data.message === 'Ok') {
         message.success('提交成功');
       } else {
@@ -120,6 +140,19 @@ const CustomerList = () => {
       }
     });
     setOpen(false);
+  };
+
+  //搜索框查询时，返回相应的查询条目
+  const onChangeHandler = (event: any) => {
+    const currentSearchData = data.filter((item) => item.name.includes(event.target.value));
+    //console.log(event);
+    setSearchData(currentSearchData);
+  };
+
+  const onChangeHandler02 = (value: string) => {
+    const currentSearchData = data.filter((item) => item.name.includes(value));
+    //console.log(value);
+    setSearchData(currentSearchData);
   };
 
   const columns = [
@@ -187,8 +220,17 @@ const CustomerList = () => {
   return (
     <PageContainer content="尊敬的销售员工，请认真填写跟进客户信息，方便后续与客户达成合作。">
       <Card bordered={false}>
+        {/*<input type="search" onChange={onChangeHandler}/>*/}
+        <Search
+          placeholder="亦可以根据姓名进行快速检索"
+          enterButton="根据姓名快速检索！"
+          size="large"
+          // suffix={suffix}
+          onChange={onChangeHandler}
+          onSearch={onChangeHandler02}
+        />
         <>
-          <Table columns={columns} dataSource={data} />
+          <Table columns={columns} dataSource={searchData} />
 
           <Modal
             title="填写详细信息"
