@@ -25,6 +25,7 @@ const BusinessOpportunitiesList = () => {
     businessDetail: '', //商机跟进阶段的详细信息
     projectApprovalDetail: '', //立项阶段的详细信息
     transactionMod: false, //交易模式 Ture为招投标，False为非招投标
+    submitTime: '', //立项提交时间
   });
 
   //商机基础消息类型
@@ -45,6 +46,7 @@ const BusinessOpportunitiesList = () => {
     businessDetail: string; //商机跟进阶段的详细信息
     projectApprovalDetail: string; //立项阶段的详细信息
     transactionMod: boolean; //交易模式 Ture为招投标，False为非招投标
+    submitTime: string; //立项提交时间
   };
 
   const fetchCustomerList = () => {
@@ -67,6 +69,7 @@ const BusinessOpportunitiesList = () => {
           businessDetail: '需要内网防火墙', //商机跟进阶段的详细信息
           projectApprovalDetail: '确定需要', //立项阶段的详细信息
           transactionMod: false, //交易模式 Ture为招投标，False为非招投标
+          submitTime: '2023/3/18 17:54:12', //立项提交时间
         },
         {
           projectID: '002',
@@ -84,7 +87,8 @@ const BusinessOpportunitiesList = () => {
           detail: '服务器有被DDOS攻击的问题',
           businessDetail: '需要内网防火墙', //商机跟进阶段的详细信息
           projectApprovalDetail: '确定需要', //立项阶段的详细信息
-          transactionMod: false, //交易模式 Ture为招投标，False为非招投标
+          transactionMod: true, //交易模式 Ture为招投标，False为非招投标
+          submitTime: '2022/3/2 17:54:12', //立项提交时间
         },
         {
           projectID: '003',
@@ -103,6 +107,7 @@ const BusinessOpportunitiesList = () => {
           businessDetail: '需要内网防火墙', //商机跟进阶段的详细信息
           projectApprovalDetail: '确定需要', //立项阶段的详细信息
           transactionMod: false, //交易模式 Ture为招投标，False为非招投标
+          submitTime: '2003/12/11 17:54:12', //立项提交时间
         },
       ],
     };
@@ -179,6 +184,11 @@ const BusinessOpportunitiesList = () => {
       render: (text: boolean) => (text ? '招投标' : '非招标'),
     },
     {
+      title: '立项提交时间',
+      dataIndex: 'submitTime',
+      key: 'submitTime',
+    },
+    {
       title: '此客户全部基础信息',
       key: 'allBasicInfo',
       render: (text: string, record: ProjectApprovalInformation) => (
@@ -215,6 +225,9 @@ const BusinessOpportunitiesList = () => {
             <Form>
               <Form.Item label="立项编号">
                 <Input value={basicInfo.projectID} disabled />
+              </Form.Item>
+              <Form.Item label="立项提交时间">
+                <Input value={basicInfo.submitTime} disabled />
               </Form.Item>
               <Form.Item label="客户编号">
                 <Input value={basicInfo.customerID} disabled />

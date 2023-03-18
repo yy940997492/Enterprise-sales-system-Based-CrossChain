@@ -51,6 +51,7 @@ const ProjectApproval = () => {
   //提交立项信息类型
   type projectApprovalFlowUpInformation = {
     projectApprovalDetail: string; //立项阶段的详细信息
+    submitTime: string; //提交时间
   };
   const fetchCustomerList = () => {
     const res = {
@@ -142,6 +143,7 @@ const ProjectApproval = () => {
     };
     //提交详细信息，将status状态变为true
     detail.projectApprovalStatus = true;
+    detail.submitTime = new Date().toLocaleString();
     console.log(detail);
     fakeSubmitDetailForm(detail).then((res) => {
       if (res.data.message === 'Ok') {
