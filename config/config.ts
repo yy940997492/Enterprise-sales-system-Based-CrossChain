@@ -163,8 +163,8 @@ export default defineConfig({
         {
           name: '提交立项信息',
           icon: 'smile',
-          path: '/sale/businessOpportunitiesInformation/projectApprovalInformation',
-          component: './sale/businessOpportunitiesInformation/projectApprovalInformation',
+          path: '/sale/businessOpportunitiesInformation/submitProjectApprovalInformation',
+          component: './sale/businessOpportunitiesInformation/submitProjectApprovalInformation',
         },
       ],
     },
