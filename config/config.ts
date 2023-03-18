@@ -182,6 +182,20 @@ export default defineConfig({
         },
       ],
     },
+    {
+      path: '/sale/contractManagement',
+      icon: 'form',
+      name: '合同信息管理',
+      access: 'canSale',
+      routes: [
+        {
+          name: '合同审批（非招标）',
+          icon: 'smile',
+          path: '/sale/contractManagement/nonBiddingContracts',
+          component: './sale/contractManagement/nonBiddingContracts',
+        },
+      ],
+    },
     // {
     //   path: '/form',
     //   icon: 'form',
