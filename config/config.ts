@@ -168,6 +168,20 @@ export default defineConfig({
         },
       ],
     },
+    {
+      path: '/sale/projectApprovalInformation',
+      icon: 'form',
+      name: '立项信息管理',
+      access: 'canSale',
+      routes: [
+        {
+          name: '查看立项信息',
+          icon: 'smile',
+          path: '/sale/projectApprovalInformation/showProjectApprovalInformation',
+          component: './sale/projectApprovalInformation/showProjectApprovalInformation',
+        },
+      ],
+    },
     // {
     //   path: '/form',
     //   icon: 'form',
