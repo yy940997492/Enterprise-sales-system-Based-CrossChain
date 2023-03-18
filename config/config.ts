@@ -160,6 +160,12 @@ export default defineConfig({
           path: '/sale/businessOpportunitiesInformation/showBusinessOpportunities',
           component: './sale/businessOpportunitiesInformation/showBusinessOpportunities',
         },
+        {
+          name: '提交立项信息',
+          icon: 'smile',
+          path: '/sale/businessOpportunitiesInformation/projectApprovalInformation',
+          component: './sale/businessOpportunitiesInformation/projectApprovalInformation',
+        },
       ],
     },
     // {
