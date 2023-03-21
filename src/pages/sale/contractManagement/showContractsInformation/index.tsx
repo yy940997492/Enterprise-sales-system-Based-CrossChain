@@ -1,33 +1,23 @@
-//提交审核结果
+//查看立项信息
 import { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Radio, message, Card } from 'antd';
+import { Table, Button, Modal, Form, Input, Card } from 'antd';
 const { Search } = Input;
-import { fakeSubmitDetailForm } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
-  ProjectApprovalBasicInformation,
-  projectApprovalFlowUpInformation,
-} from '../../businessOpportunitiesInformation/submitProjectApprovalInformation/index';
+  ReviewNonBiddingContractsInformation,
+  NonBiddingContractsInformation,
+} from '../nonBiddingContracts/index';
+//合同类型
+type ContractsInformation = NonBiddingContractsInformation &
+  ReviewNonBiddingContractsInformation & { contractsID: string };
+//合同存入数据库和区块链时，会生成一个唯一的合同ID的类型,因此加一个合同ID
 
-//非招标立项合同基础信息
-export type NonBiddingContractsInformation = ProjectApprovalBasicInformation &
-  projectApprovalFlowUpInformation & { projectID: string };
-//存入数据库的确认立项信息，有一个自增的projectID，因此要多一个此属性。
-
-//审核之后非招标立项信息新增类型
-export type ReviewNonBiddingContractsInformation = {
-  reviewResult: boolean; //审核结果,true为通过，false为不通过
-  reviewRemarks: string; //审核备注
-  reviewTime: string; //审核时间
-};
-
-const ProjectApproval = () => {
-  const [data, setData] = useState<NonBiddingContractsInformation[]>([]); //保存完整的相应数据
-  const [searchData, setSearchData] = useState<NonBiddingContractsInformation[]>([]); //保存查询的数据
-  const [open, setOpen] = useState<boolean>(false); //第一个open，控制第一个模态框的显示与隐藏，第一个模态框是用了显示填写详细信息的模态框。
+const BusinessOpportunitiesList = () => {
+  const [data, setData] = useState<ContractsInformation[]>([]); //保存完整的相应数据
+  const [searchData, setSearchData] = useState<ContractsInformation[]>([]); //保存查询的数据
   const [open02, setOpen02] = useState<boolean>(false); //第二个open，控制第二个模态框的显示与隐藏，第二个模态框是用来显示客户全部基础信息的模态框。
-  const [detailForm] = Form.useForm();
-  const [basicInfo, setBasicInfo] = useState<NonBiddingContractsInformation>({
+  const [basicInfo, setBasicInfo] = useState<ContractsInformation>({
+    contractsID: '',
     projectID: '',
     customerID: '',
     address: '',
@@ -52,12 +42,16 @@ const ProjectApproval = () => {
     submitTime: '', //提交时间
     transactionMode: false, //交易方式,ture为招投标，false为非招投标
     reviewStatus: false,
+    reviewResult: false, //审核结果,true为通过，false为不通过
+    reviewRemarks: '', //审核备注
+    reviewTime: '', //审核时间
   });
 
   const fetchCustomerList = () => {
     const res = {
       data: [
         {
+          contractsID: '123abfdce534',
           projectID: '001',
           customerID: '1',
           name: '韩立',
@@ -82,8 +76,12 @@ const ProjectApproval = () => {
           submitTime: '2021/3/2 17:54:12',
           transactionMode: false,
           reviewStatus: false,
+          reviewResult: true,
+          reviewRemarks: '好项目统一',
+          reviewTime: '2021/3/2 17:54:12',
         },
         {
+          contractsID: 'abcabfdce535',
           projectID: '002',
           customerID: '2',
           name: '南宫婉',
@@ -108,8 +106,12 @@ const ProjectApproval = () => {
           submitTime: '2021/3/2 17:54:12',
           transactionMode: false,
           reviewStatus: false,
+          reviewResult: true,
+          reviewRemarks: '好项目统一',
+          reviewTime: '2021/3/2 17:54:12',
         },
         {
+          contractsID: 'defabfdce536',
           projectID: '003',
           customerID: '3',
           name: '紫灵',
@@ -132,8 +134,11 @@ const ProjectApproval = () => {
           projectApprovalStatus: false,
           projectApprovalDetail: '确定需要',
           submitTime: '2021/3/2 17:54:12',
-          transactionMode: false,
+          transactionMode: true,
           reviewStatus: false,
+          reviewResult: true,
+          reviewRemarks: '好项目统一',
+          reviewTime: '2021/3/2 17:54:12',
         },
       ],
     };
@@ -147,15 +152,9 @@ const ProjectApproval = () => {
   }, []);
 
   //填写跟进信息，弹出模态框
-  const handleEnterDetailModal = (record: NonBiddingContractsInformation) => {
-    //console.log(record);
-    //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
-    setBasicInfo(record);
-    setOpen(true);
-  };
 
   //点击查看客户全部商机基础信息时，弹出的模态框
-  const handleShowAllBasicInfo = (record: NonBiddingContractsInformation) => {
+  const handleShowAllBasicInfo = (record: ContractsInformation) => {
     //console.log('rc',record);
     //setBasicInfo(Object.assign({},record));
     //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
@@ -164,24 +163,6 @@ const ProjectApproval = () => {
   };
   //console.log('bi',basicInfo);
   //提交详细跟进信息
-  const handleDetailFormSubmit = async (values: ReviewNonBiddingContractsInformation) => {
-    const detail: ReviewNonBiddingContractsInformation & NonBiddingContractsInformation = {
-      ...basicInfo,
-      ...values,
-    };
-    //添加审核时间
-    detail.reviewTime = new Date().toLocaleString();
-    detail.reviewStatus = true; //表明已经审核，不管是否通过
-    //console.log(detail);
-    fakeSubmitDetailForm(detail).then((res) => {
-      if (res.data.message === 'Ok') {
-        message.success('提交成功');
-      } else {
-        message.error('提交失败');
-      }
-    });
-    setOpen(false);
-  };
 
   //搜索框查询时，返回相应的查询条目
   const onChangeHandler = (event: any) => {
@@ -198,7 +179,12 @@ const ProjectApproval = () => {
 
   const columns = [
     {
-      title: '项目编号',
+      title: '合同编号',
+      dataIndex: 'contractsID',
+      key: 'contractsID',
+    },
+    {
+      title: '立项编号',
       dataIndex: 'projectID',
       key: 'projectID',
     },
@@ -239,23 +225,11 @@ const ProjectApproval = () => {
       key: 'submitTime',
     },
     {
-      title: '立项合同信息',
+      title: '此客户全部基础信息',
       key: 'allBasicInfo',
-      render: (text: string, record: NonBiddingContractsInformation) => (
+      render: (text: string, record: ContractsInformation) => (
         <Button type="primary" onClick={() => handleShowAllBasicInfo(record)}>
           查看
-        </Button>
-      ),
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (
-        text: string,
-        record: NonBiddingContractsInformation, //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据。
-      ) => (
-        <Button type="primary" onClick={() => handleEnterDetailModal(record)}>
-          审核立项合同
         </Button>
       ),
     },
@@ -264,7 +238,7 @@ const ProjectApproval = () => {
   //   console.log(values);
   // }
   return (
-    <PageContainer content="尊敬的销售员工，在这里查看立项信息（非招标），并且按照公司决议，审核立项合同。">
+    <PageContainer content="尊敬的销售员工，在这里查看立项信息。非招标的由销售部提交合同审批，招投标的由商务部门审核">
       <Card bordered={false}>
         {/*<input type="search" onChange={onChangeHandler}/>*/}
         <Search
@@ -277,61 +251,6 @@ const ProjectApproval = () => {
         />
         <>
           <Table columns={columns} dataSource={searchData} />
-
-          <Modal
-            title="审核立项合同"
-            open={open}
-            onCancel={() => setOpen(false)}
-            onOk={detailForm.submit}
-          >
-            <Form form={detailForm} onFinish={handleDetailFormSubmit}>
-              <Form.Item label="立项编号">
-                <Input value={basicInfo.projectID} disabled />
-              </Form.Item>
-              <Form.Item label="立项提交时间">
-                <Input value={basicInfo.submitTime} disabled />
-              </Form.Item>
-              <Form.Item label="客户编号" valuePropName="id">
-                <Input value={basicInfo.customerID} disabled />
-              </Form.Item>
-              <Form.Item label="客户姓名">
-                <Input value={basicInfo.name} disabled />
-              </Form.Item>
-              <Form.Item label="联系方式">
-                <Input value={basicInfo.phone} disabled />
-              </Form.Item>
-              <Form.Item label="地址">
-                <Input value={basicInfo.address} disabled />
-              </Form.Item>
-              <Form.Item label="详细信息">
-                <Input value={basicInfo.detail} disabled />
-              </Form.Item>
-              <Form.Item label="详细商机信息">
-                <Input value={basicInfo.businessDetail} disabled />
-              </Form.Item>
-              <Form.Item label="详细立项信息">
-                <Input value={basicInfo.projectApprovalDetail} disabled />
-              </Form.Item>
-              <Form.Item
-                label="审核结果"
-                name="reviewResult"
-                rules={[
-                  {
-                    required: true,
-                    message: '请审核是否通过',
-                  },
-                ]}
-              >
-                <Radio.Group buttonStyle="solid">
-                  <Radio.Button value={true}>通过</Radio.Button>
-                  <Radio.Button value={false}>不通过</Radio.Button>
-                </Radio.Group>
-              </Form.Item>
-              <Form.Item label="审核备注。" name="reviewRemarks">
-                <Input.TextArea />
-              </Form.Item>
-            </Form>
-          </Modal>
 
           <Modal
             title="此客户全部基础信息"
@@ -376,11 +295,17 @@ const ProjectApproval = () => {
               <Form.Item label="详细信息">
                 <Input value={basicInfo.detail} disabled />
               </Form.Item>
+              <Form.Item label="详细商机信息">
+                <Input value={basicInfo.businessDetail} disabled />
+              </Form.Item>
+              <Form.Item label="详细立项信息">
+                <Input value={basicInfo.projectApprovalDetail} disabled />
+              </Form.Item>
               <Form.Item label="接洽人员">
                 <Input value={basicInfo.sale} disabled />
               </Form.Item>
-              <Form.Item label="详细商机信息">
-                <Input value={basicInfo.businessDetail} disabled />
+              <Form.Item label="状态">
+                <Input value={String(basicInfo.transactionMode)} disabled />
               </Form.Item>
             </Form>
           </Modal>
@@ -390,4 +315,4 @@ const ProjectApproval = () => {
   );
 };
 
-export default ProjectApproval;
+export default BusinessOpportunitiesList;

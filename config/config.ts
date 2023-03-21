@@ -201,7 +201,7 @@ export default defineConfig({
           component: './sale/contractManagement/biddingContracts',
         },
         {
-          name: '合同审批（招投标）',
+          name: '查看已审核通过合同',
           icon: 'smile',
           path: '/sale/contractManagement/showContractsInformation',
           component: './sale/contractManagement/showContractsInformation',
