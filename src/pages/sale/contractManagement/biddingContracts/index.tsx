@@ -80,7 +80,7 @@ const ProjectApproval = () => {
           projectApprovalStatus: false,
           projectApprovalDetail: '确定需要',
           submitTime: '2021/3/2 17:54:12',
-          transactionMode: false,
+          transactionMode: true,
           reviewStatus: false,
         },
         {
@@ -106,7 +106,7 @@ const ProjectApproval = () => {
           projectApprovalStatus: false,
           projectApprovalDetail: '确定需要',
           submitTime: '2021/3/2 17:54:12',
-          transactionMode: false,
+          transactionMode: true,
           reviewStatus: false,
         },
         {
@@ -132,7 +132,7 @@ const ProjectApproval = () => {
           projectApprovalStatus: false,
           projectApprovalDetail: '确定需要',
           submitTime: '2021/3/2 17:54:12',
-          transactionMode: false,
+          transactionMode: true,
           reviewStatus: false,
         },
       ],
@@ -264,7 +264,7 @@ const ProjectApproval = () => {
   //   console.log(values);
   // }
   return (
-    <PageContainer content="尊敬的销售员工，在这里查看立项信息（非招标），并且按照公司决议，审核立项合同。">
+    <PageContainer content="尊敬的销售员工，在这里查看立项信息（招投标），并且按照公司决议，审核立项合同。">
       <Card bordered={false}>
         {/*<input type="search" onChange={onChangeHandler}/>*/}
         <Search

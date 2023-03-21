@@ -194,6 +194,18 @@ export default defineConfig({
           path: '/sale/contractManagement/nonBiddingContracts',
           component: './sale/contractManagement/nonBiddingContracts',
         },
+        {
+          name: '合同审批（招投标）',
+          icon: 'smile',
+          path: '/sale/contractManagement/biddingContracts',
+          component: './sale/contractManagement/biddingContracts',
+        },
+        {
+          name: '合同审批（招投标）',
+          icon: 'smile',
+          path: '/sale/contractManagement/showContractsInformation',
+          component: './sale/contractManagement/showContractsInformation',
+        },
       ],
     },
     // {
