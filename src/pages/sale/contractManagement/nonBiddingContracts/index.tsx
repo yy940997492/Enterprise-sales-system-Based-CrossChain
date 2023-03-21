@@ -4,6 +4,22 @@ import { Table, Button, Modal, Form, Input, Radio, message, Card } from 'antd';
 const { Search } = Input;
 import { fakeSubmitDetailForm } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
+import {
+  ProjectApprovalBasicInformation,
+  projectApprovalFlowUpInformation,
+} from '../../businessOpportunitiesInformation/submitProjectApprovalInformation/index';
+
+//非招标立项合同基础信息
+type NonBiddingContractsInformation = ProjectApprovalBasicInformation &
+  projectApprovalFlowUpInformation & { projectID: string };
+//存入数据库的确认立项信息，有一个自增的projectID，因此要多一个此属性。
+
+//审核之后非招标立项信息新增类型
+type ReviewNonBiddingContractsInformation = {
+  reviewResult: boolean; //审核结果,true为通过，false为不通过
+  reviewRemarks: string; //审核备注
+  reviewTime: string; //审核时间
+};
 
 const ProjectApproval = () => {
   const [data, setData] = useState<NonBiddingContractsInformation[]>([]); //保存完整的相应数据
@@ -24,40 +40,20 @@ const ProjectApproval = () => {
     phone: '',
     sale: '',
     sex: '',
+    status: false, //这个是基础信息跟进状态分为两类：true为已经跟进填写了跟进信息，false为未跟进
+    dealIntention: false, //意向度分为两类：true为有意向，false为无意向
+    businessOpportunityStatus: false,
+    weight: 0,
     detail: '', //客户信息调查跟进阶段的详细信息
-    businessDetail: '', //商机跟进阶段的详细信息
+    effectiveBusinessOpportunity: false, //有效商机
+    businessDetail: '', //详细商机信息。如：客户需求，客户预算，客户购买意愿等
+    projectApprovalStatus: false, //商机跟进之后，就会进入项目立项阶段，此为项目立项状态
     projectApprovalDetail: '', //立项阶段的详细信息
-    transactionMod: false, //交易模式 Ture为招投标，False为非招投标
-    submitTime: '', //立项提交时间
+    submitTime: '', //提交时间
+    transactionMode: false, //交易方式,ture为招投标，false为非招投标
+    reviewStatus: false,
   });
 
-  //非招标立项合同基础信息
-  type NonBiddingContractsInformation = {
-    projectID: string; //立项ID
-    customerID: string;
-    name: string;
-    sex: string;
-    dateTime: string; //接洽日期
-    birthdate: string;
-    address: string; //客户住址
-    company: string; //客户单位
-    phone: string;
-    mail: string;
-    description: string; //简要描述
-    sale: string; //接洽人员
-    detail: string; //客户信息调查跟进阶段的详细信息
-    businessDetail: string; //商机跟进阶段的详细信息
-    projectApprovalDetail: string; //立项阶段的详细信息
-    transactionMod: boolean; //交易模式 Ture为招投标，False为非招投标
-    submitTime: string; //立项提交时间
-  };
-
-  //审核之后非招标立项信息新增类型
-  type ReviewNonBiddingContractsInformation = {
-    reviewResult: boolean; //审核结果,true为通过，false为不通过
-    reviewRemarks: string; //审核备注
-    reviewTime: string; //审核时间
-  };
   const fetchCustomerList = () => {
     const res = {
       data: [
@@ -74,11 +70,18 @@ const ProjectApproval = () => {
           mail: '520@qq.com',
           description: '这是一个好人',
           sale: '张三',
+          weight: 60,
+          status: true,
+          dealIntention: true,
+          businessOpportunityStatus: false,
           detail: '需要解决内网安全问题',
-          businessDetail: '需要内网防火墙', //商机跟进阶段的详细信息
-          projectApprovalDetail: '确定需要', //立项阶段的详细信息
-          transactionMod: false, //交易模式 Ture为招投标，False为非招投标
-          submitTime: '2023/3/18 17:54:12', //立项提交时间
+          effectiveBusinessOpportunity: true,
+          businessDetail: '需要安全工程师驻厂进行代码审计',
+          projectApprovalStatus: false,
+          projectApprovalDetail: '确定需要',
+          submitTime: '2021/3/2 17:54:12',
+          transactionMode: false,
+          reviewStatus: false,
         },
         {
           projectID: '002',
@@ -93,11 +96,18 @@ const ProjectApproval = () => {
           mail: '123@qq.com',
           description: '这是一个美女',
           sale: '李四',
+          weight: 50,
+          status: true,
+          dealIntention: true,
+          businessOpportunityStatus: false,
           detail: '服务器有被DDOS攻击的问题',
-          businessDetail: '需要内网防火墙', //商机跟进阶段的详细信息
-          projectApprovalDetail: '确定需要', //立项阶段的详细信息
-          transactionMod: false, //交易模式 Ture为招投标，False为非招投标
-          submitTime: '2022/3/2 17:54:12', //立项提交时间
+          effectiveBusinessOpportunity: true,
+          businessDetail: '需要安全工程师驻厂进行代码审计',
+          projectApprovalStatus: false,
+          projectApprovalDetail: '确定需要',
+          submitTime: '2021/3/2 17:54:12',
+          transactionMode: false,
+          reviewStatus: false,
         },
         {
           projectID: '003',
@@ -112,11 +122,18 @@ const ProjectApproval = () => {
           mail: '9999@qq.com',
           description: '人界第一美女',
           sale: '王五',
+          weight: 90,
+          status: true,
+          dealIntention: true,
+          businessOpportunityStatus: false,
           detail: '公司有代码安全审计的需求',
-          businessDetail: '需要内网防火墙', //商机跟进阶段的详细信息
-          projectApprovalDetail: '确定需要', //立项阶段的详细信息
-          transactionMod: false, //交易模式 Ture为招投标，False为非招投标
-          submitTime: '2003/12/11 17:54:12', //立项提交时间
+          effectiveBusinessOpportunity: true,
+          businessDetail: '需要安全工程师驻厂进行代码审计',
+          projectApprovalStatus: false,
+          projectApprovalDetail: '确定需要',
+          submitTime: '2021/3/2 17:54:12',
+          transactionMode: false,
+          reviewStatus: false,
         },
       ],
     };
@@ -154,7 +171,8 @@ const ProjectApproval = () => {
     };
     //添加审核时间
     detail.reviewTime = new Date().toLocaleString();
-    console.log(detail);
+    detail.reviewStatus = true; //表明已经审核，不管是否通过
+    //console.log(detail);
     fakeSubmitDetailForm(detail).then((res) => {
       if (res.data.message === 'Ok') {
         message.success('提交成功');

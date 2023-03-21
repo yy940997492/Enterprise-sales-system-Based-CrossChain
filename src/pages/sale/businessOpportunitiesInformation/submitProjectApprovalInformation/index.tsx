@@ -4,6 +4,22 @@ import { Table, Button, Modal, Form, Input, Radio, message, Card } from 'antd';
 const { Search } = Input;
 import { fakeSubmitDetailForm } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
+import {
+  BusinessOpportunitiesBasicInformation,
+  BusinessOpportunitiesFlowUpInformation,
+} from '../showBusinessOpportunities/index';
+
+//立项基础消息类型
+export type ProjectApprovalBasicInformation = BusinessOpportunitiesBasicInformation &
+  BusinessOpportunitiesFlowUpInformation;
+
+//提交立项信息类型
+export type projectApprovalFlowUpInformation = {
+  projectApprovalDetail: string; //立项阶段的详细信息
+  submitTime: string; //提交时间
+  transactionMode: boolean; //交易方式,ture为招投标，false为非招投标
+  reviewStatus: boolean; //审核状态，true已经审核，false为未审核
+};
 
 const ProjectApproval = () => {
   const [data, setData] = useState<ProjectApprovalBasicInformation[]>([]); //保存完整的相应数据
@@ -23,36 +39,16 @@ const ProjectApproval = () => {
     phone: '',
     sale: '',
     sex: '',
-    projectApprovalStatus: false,
+    status: false, //这个是基础信息跟进状态分为两类：true为已经跟进填写了跟进信息，false为未跟进
+    dealIntention: false, //意向度分为两类：true为有意向，false为无意向
+    businessOpportunityStatus: false,
     weight: 0,
     detail: '', //客户信息调查跟进阶段的详细信息
-    businessDetail: '', //商机跟进阶段的详细信息
+    effectiveBusinessOpportunity: false, //有效商机
+    businessDetail: '', //详细商机信息。如：客户需求，客户预算，客户购买意愿等
+    projectApprovalStatus: false, //商机跟进之后，就会进入项目立项阶段，此为项目立项状态
   });
 
-  //立项基础消息类型
-  type ProjectApprovalBasicInformation = {
-    customerID: string;
-    name: string;
-    sex: string;
-    dateTime: string; //接洽日期
-    birthdate: string;
-    address: string; //客户住址
-    company: string; //客户单位
-    phone: string;
-    mail: string;
-    description: string; //简要描述
-    sale: string; //接洽人员
-    weight: number; //权重
-    projectApprovalStatus: boolean; //状态分为两类：true为已经提交了立项信息，false为还没有提交立项信息
-    detail: string; //客户信息调查跟进阶段的详细信息
-    businessDetail: string; //商机跟进阶段的详细信息
-  };
-
-  //提交立项信息类型
-  type projectApprovalFlowUpInformation = {
-    projectApprovalDetail: string; //立项阶段的详细信息
-    submitTime: string; //提交时间
-  };
   const fetchCustomerList = () => {
     const res = {
       data: [
@@ -69,9 +65,13 @@ const ProjectApproval = () => {
           description: '这是一个好人',
           sale: '张三',
           weight: 60,
-          projectApprovalStatus: false,
+          status: true,
+          dealIntention: true,
+          businessOpportunityStatus: false,
           detail: '需要解决内网安全问题',
-          businessDetail: '拟采购内网防火墙设备',
+          effectiveBusinessOpportunity: true,
+          businessDetail: '需要安全工程师驻厂进行代码审计',
+          projectApprovalStatus: false,
         },
         {
           customerID: '2',
@@ -86,9 +86,13 @@ const ProjectApproval = () => {
           description: '这是一个美女',
           sale: '李四',
           weight: 50,
-          projectApprovalStatus: false,
+          status: true,
+          dealIntention: true,
+          businessOpportunityStatus: false,
           detail: '服务器有被DDOS攻击的问题',
-          businessDetail: '拟采购防火墙设备，为了防止DDOS攻击',
+          effectiveBusinessOpportunity: true,
+          businessDetail: '需要安全工程师驻厂进行代码审计',
+          projectApprovalStatus: false,
         },
         {
           customerID: '3',
@@ -103,9 +107,13 @@ const ProjectApproval = () => {
           description: '人界第一美女',
           sale: '王五',
           weight: 90,
-          projectApprovalStatus: false,
+          status: true,
+          dealIntention: true,
+          businessOpportunityStatus: false,
           detail: '公司有代码安全审计的需求',
+          effectiveBusinessOpportunity: true,
           businessDetail: '需要安全工程师驻厂进行代码审计',
+          projectApprovalStatus: false,
         },
       ],
     };
@@ -144,6 +152,7 @@ const ProjectApproval = () => {
     //提交详细信息，将status状态变为true
     detail.projectApprovalStatus = true;
     detail.submitTime = new Date().toLocaleString();
+    detail.reviewStatus = false;
     console.log(detail);
     fakeSubmitDetailForm(detail).then((res) => {
       if (res.data.message === 'Ok') {

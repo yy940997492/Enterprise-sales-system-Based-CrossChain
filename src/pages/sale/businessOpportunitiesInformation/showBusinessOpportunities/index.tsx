@@ -4,7 +4,21 @@ import { Table, Button, Modal, Form, Input, Radio, message, Card } from 'antd';
 const { Search } = Input;
 import { fakeSubmitDetailForm } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
+import {
+  CustomerBasicInformation,
+  CustomerFlowUpInformation,
+} from '../../customerInformation/followUpRecord/index';
 
+//商机基础消息类型
+export type BusinessOpportunitiesBasicInformation = CustomerBasicInformation &
+  CustomerFlowUpInformation;
+
+//商机跟进信息类型
+export type BusinessOpportunitiesFlowUpInformation = {
+  effectiveBusinessOpportunity: boolean; //有效商机
+  businessDetail: string; //详细商机信息。如：客户需求，客户预算，客户购买意愿等
+  projectApprovalStatus: boolean; //商机跟进之后，就会进入项目立项阶段，此为项目立项状态
+};
 const BusinessOpportunitiesList = () => {
   const [data, setData] = useState<BusinessOpportunitiesBasicInformation[]>([]); //保存完整的相应数据
   const [searchData, setSearchData] = useState<BusinessOpportunitiesBasicInformation[]>([]); //保存查询的数据
@@ -23,34 +37,13 @@ const BusinessOpportunitiesList = () => {
     phone: '',
     sale: '',
     sex: '',
+    status: false, //这个是基础信息跟进状态分为两类：true为已经跟进填写了跟进信息，false为未跟进
+    dealIntention: false, //意向度分为两类：true为有意向，false为无意向
     businessOpportunityStatus: false,
     weight: 0,
     detail: '', //客户信息调查跟进阶段的详细信息
   });
 
-  //商机基础消息类型
-  type BusinessOpportunitiesBasicInformation = {
-    customerID: string;
-    name: string;
-    sex: string;
-    dateTime: string; //接洽日期
-    birthdate: string;
-    address: string; //客户住址
-    company: string; //客户单位
-    phone: string;
-    mail: string;
-    description: string; //简要描述
-    sale: string; //接洽人员
-    weight: number; //权重
-    businessOpportunityStatus: boolean; //状态分为两类：true为已经跟进填写了跟进信息，false为未跟进
-    detail: string; //客户信息调查跟进阶段的详细信息
-  };
-
-  //商机跟进信息类型
-  type BusinessOpportunitiesFlowUpInformation = {
-    effectiveBusinessOpportunity: boolean; //有效商机
-    businessDetail: string; //详细商机信息。如：客户需求，客户预算，客户购买意愿等
-  };
   const fetchCustomerList = () => {
     const res = {
       data: [
@@ -67,6 +60,8 @@ const BusinessOpportunitiesList = () => {
           description: '这是一个好人',
           sale: '张三',
           weight: 60,
+          status: true,
+          dealIntention: true,
           businessOpportunityStatus: false,
           detail: '需要解决内网安全问题',
         },
@@ -83,6 +78,8 @@ const BusinessOpportunitiesList = () => {
           description: '这是一个美女',
           sale: '李四',
           weight: 50,
+          status: true,
+          dealIntention: true,
           businessOpportunityStatus: false,
           detail: '服务器有被DDOS攻击的问题',
         },
@@ -99,6 +96,8 @@ const BusinessOpportunitiesList = () => {
           description: '人界第一美女',
           sale: '王五',
           weight: 90,
+          status: true,
+          dealIntention: true,
           businessOpportunityStatus: false,
           detail: '公司有代码安全审计的需求',
         },
@@ -138,6 +137,7 @@ const BusinessOpportunitiesList = () => {
     };
     //提交详细信息，将status状态变为true
     detail.businessOpportunityStatus = true;
+    detail.projectApprovalStatus = false;
     console.log(detail);
     fakeSubmitDetailForm(detail).then((res) => {
       if (res.data.message === 'Ok') {

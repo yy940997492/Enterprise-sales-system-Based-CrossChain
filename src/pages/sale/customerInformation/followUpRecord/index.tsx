@@ -4,6 +4,27 @@ const { Search } = Input;
 import { fakeSubmitDetailForm } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
 
+export type CustomerBasicInformation = {
+  customerID: string;
+  name: string;
+  sex: string;
+  dateTime: string; //接洽日期
+  birthdate: string;
+  address: string; //客户住址
+  company: string; //客户单位
+  phone: string;
+  mail: string;
+  description: string; //简要描述
+  sale: string; //接洽人员
+  weight: number; //权重
+  status: boolean; //状态分为两类：true为已经跟进填写了跟进信息，false为未跟进
+};
+//客户跟进信息类型
+export type CustomerFlowUpInformation = {
+  dealIntention: boolean; //意向
+  detail: string; //详细信息
+  businessOpportunityStatus: boolean; //填写了基础信息的跟进之后，就会等待填写商机信息的跟进，这个状态就是用来判断是否填写了商机信息的跟进
+};
 const CustomerList = () => {
   const [data, setData] = useState<CustomerBasicInformation[]>([]); //保存完整的相应数据
   const [searchData, setSearchData] = useState<CustomerBasicInformation[]>([]); //保存查询的数据
@@ -27,26 +48,7 @@ const CustomerList = () => {
   });
 
   //客户基础消息类型
-  type CustomerBasicInformation = {
-    customerID: string;
-    name: string;
-    sex: string;
-    dateTime: string; //接洽日期
-    birthdate: string;
-    address: string; //客户住址
-    company: string; //客户单位
-    phone: string;
-    mail: string;
-    description: string; //简要描述
-    sale: string; //接洽人员
-    weight: number; //权重
-    status: boolean; //状态分为两类：true为已经跟进填写了跟进信息，false为未跟进
-  };
-  //客户跟进信息类型
-  type CustomerFlowUpInformation = {
-    dealIntention: boolean; //意向
-    detail: string; //详细信息
-  };
+
   const fetchCustomerList = () => {
     const res = {
       data: [
@@ -131,8 +133,10 @@ const CustomerList = () => {
     };
     //提交详细信息，将status状态变为true
     detail.status = true;
-    console.log(detail);
+    detail.businessOpportunityStatus = false; //填写了基础信息的跟进之后，就会等待填写商机信息的跟进，这个状态就是用来判断是否填写了商机信息的跟进
+    //console.log(detail);
     fakeSubmitDetailForm(detail).then((res) => {
+      console.log(res.data);
       if (res.data.message === 'Ok') {
         message.success('提交成功');
       } else {
