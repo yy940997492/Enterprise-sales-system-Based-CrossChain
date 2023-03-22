@@ -208,6 +208,20 @@ export default defineConfig({
         },
       ],
     },
+    {
+      path: '/business/biddingInformation',
+      icon: 'form',
+      name: '招标项目管理',
+      access: 'canBusiness',
+      routes: [
+        {
+          name: '招标审核（招投标）',
+          icon: 'smile',
+          path: '/business/biddingInformation/review',
+          component: './business/biddingInformation/review',
+        },
+      ],
+    },
     // {
     //   path: '/form',
     //   icon: 'form',

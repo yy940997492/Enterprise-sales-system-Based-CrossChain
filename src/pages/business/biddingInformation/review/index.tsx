@@ -7,27 +7,29 @@ import { PageContainer } from '@ant-design/pro-layout';
 import {
   ProjectApprovalBasicInformation,
   projectApprovalFlowUpInformation,
-} from '../../businessOpportunitiesInformation/submitProjectApprovalInformation/index';
+} from '@/pages/sale/businessOpportunitiesInformation/submitProjectApprovalInformation/index';
 
-//非招标立项合同基础信息
-type NonBiddingContractsInformation = ProjectApprovalBasicInformation &
-  projectApprovalFlowUpInformation & { projectID: string };
+//商务部门招投标立项基础信息，也就是销售部门中立项信息中招投标成交方式的信息
+type BiddingBasicInformation = ProjectApprovalBasicInformation &
+  projectApprovalFlowUpInformation & { projectID: string } & { reviewBindingStatus: boolean };
 //存入数据库的确认立项信息，有一个自增的projectID，因此要多一个此属性。
+//因为这个是招投标的立项，商务部门从数据库里面读出来之后，要多一个投标审核，因此多加一个reviewBindingStatus属性，而原本
+//的reviewStatus属性是用之后立项合同审核的，因此要新增名为reviewProjectApprovalStatus的属性
 
-//审核之后非招标立项信息新增类型
-type ReviewNonBiddingContractsInformation = {
-  reviewResult: boolean; //审核结果,true为通过，false为不通过
-  reviewRemarks: string; //审核备注
-  reviewTime: string; //审核时间
+//商务部门投标审核信息新增字段
+type ReviewBiddingInformation = {
+  reviewBiddingResult: boolean; //商务部门投标信息审核结果,true为通过，false为不通过
+  reviewBiddingRemarks: string; //审核备注
+  reviewBiddingTime: string; //审核时间
 };
 
 const ProjectApproval = () => {
-  const [data, setData] = useState<NonBiddingContractsInformation[]>([]); //保存完整的相应数据
-  const [searchData, setSearchData] = useState<NonBiddingContractsInformation[]>([]); //保存查询的数据
+  const [data, setData] = useState<BiddingBasicInformation[]>([]); //保存完整的相应数据
+  const [searchData, setSearchData] = useState<BiddingBasicInformation[]>([]); //保存查询的数据
   const [open, setOpen] = useState<boolean>(false); //第一个open，控制第一个模态框的显示与隐藏，第一个模态框是用了显示填写详细信息的模态框。
   const [open02, setOpen02] = useState<boolean>(false); //第二个open，控制第二个模态框的显示与隐藏，第二个模态框是用来显示客户全部基础信息的模态框。
   const [detailForm] = Form.useForm();
-  const [basicInfo, setBasicInfo] = useState<NonBiddingContractsInformation>({
+  const [basicInfo, setBasicInfo] = useState<BiddingBasicInformation>({
     projectID: '',
     customerID: '',
     address: '',
@@ -52,6 +54,7 @@ const ProjectApproval = () => {
     submitTime: '', //提交时间
     transactionMode: false, //交易方式,ture为招投标，false为非招投标
     reviewStatus: false,
+    reviewBindingStatus: false,
   });
 
   const fetchCustomerList = () => {
@@ -77,11 +80,12 @@ const ProjectApproval = () => {
           detail: '需要解决内网安全问题',
           effectiveBusinessOpportunity: true,
           businessDetail: '需要安全工程师驻厂进行代码审计',
-          projectApprovalStatus: false,
+          projectApprovalStatus: true,
           projectApprovalDetail: '确定需要',
           submitTime: '2021/3/2 17:54:12',
           transactionMode: true,
           reviewStatus: false,
+          reviewBindingStatus: false,
         },
         {
           projectID: '002',
@@ -103,11 +107,12 @@ const ProjectApproval = () => {
           detail: '服务器有被DDOS攻击的问题',
           effectiveBusinessOpportunity: true,
           businessDetail: '需要安全工程师驻厂进行代码审计',
-          projectApprovalStatus: false,
+          projectApprovalStatus: true,
           projectApprovalDetail: '确定需要',
           submitTime: '2021/3/2 17:54:12',
           transactionMode: true,
           reviewStatus: false,
+          reviewBindingStatus: false,
         },
         {
           projectID: '003',
@@ -129,11 +134,12 @@ const ProjectApproval = () => {
           detail: '公司有代码安全审计的需求',
           effectiveBusinessOpportunity: true,
           businessDetail: '需要安全工程师驻厂进行代码审计',
-          projectApprovalStatus: false,
+          projectApprovalStatus: true,
           projectApprovalDetail: '确定需要',
           submitTime: '2021/3/2 17:54:12',
           transactionMode: true,
           reviewStatus: false,
+          reviewBindingStatus: false,
         },
       ],
     };
@@ -147,7 +153,7 @@ const ProjectApproval = () => {
   }, []);
 
   //填写跟进信息，弹出模态框
-  const handleEnterDetailModal = (record: NonBiddingContractsInformation) => {
+  const handleEnterDetailModal = (record: BiddingBasicInformation) => {
     //console.log(record);
     //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
     setBasicInfo(record);
@@ -155,7 +161,7 @@ const ProjectApproval = () => {
   };
 
   //点击查看客户全部商机基础信息时，弹出的模态框
-  const handleShowAllBasicInfo = (record: NonBiddingContractsInformation) => {
+  const handleShowAllBasicInfo = (record: BiddingBasicInformation) => {
     //console.log('rc',record);
     //setBasicInfo(Object.assign({},record));
     //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
@@ -164,14 +170,14 @@ const ProjectApproval = () => {
   };
   //console.log('bi',basicInfo);
   //提交详细跟进信息
-  const handleDetailFormSubmit = async (values: ReviewNonBiddingContractsInformation) => {
-    const detail: ReviewNonBiddingContractsInformation & NonBiddingContractsInformation = {
+  const handleDetailFormSubmit = async (values: ReviewBiddingInformation) => {
+    const detail: ReviewBiddingInformation & BiddingBasicInformation = {
       ...basicInfo,
       ...values,
     };
     //添加审核时间
-    detail.reviewTime = new Date().toLocaleString();
-    detail.reviewStatus = true; //表明已经审核，不管是否通过
+    detail.reviewBiddingTime = new Date().toLocaleString();
+    detail.reviewBindingStatus = true; //表明已经审核，不管是否通过
     //console.log(detail);
     fakeSubmitDetailForm(detail).then((res) => {
       if (res.data.message === 'Ok') {
@@ -239,9 +245,9 @@ const ProjectApproval = () => {
       key: 'submitTime',
     },
     {
-      title: '立项合同信息',
+      title: '立项详细信息',
       key: 'allBasicInfo',
-      render: (text: string, record: NonBiddingContractsInformation) => (
+      render: (text: string, record: BiddingBasicInformation) => (
         <Button type="primary" onClick={() => handleShowAllBasicInfo(record)}>
           查看
         </Button>
@@ -252,10 +258,10 @@ const ProjectApproval = () => {
       key: 'action',
       render: (
         text: string,
-        record: NonBiddingContractsInformation, //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据。
+        record: BiddingBasicInformation, //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据。
       ) => (
         <Button type="primary" onClick={() => handleEnterDetailModal(record)}>
-          审核立项合同
+          审核招标
         </Button>
       ),
     },
@@ -314,7 +320,7 @@ const ProjectApproval = () => {
               </Form.Item>
               <Form.Item
                 label="审核结果"
-                name="reviewResult"
+                name="reviewBiddingResult"
                 rules={[
                   {
                     required: true,
@@ -327,7 +333,7 @@ const ProjectApproval = () => {
                   <Radio.Button value={false}>不通过</Radio.Button>
                 </Radio.Group>
               </Form.Item>
-              <Form.Item label="审核备注。" name="reviewRemarks">
+              <Form.Item label="审核备注。" name="reviewBiddingRemarks">
                 <Input.TextArea />
               </Form.Item>
             </Form>
