@@ -8,8 +8,7 @@ import {
   NonBiddingContractsInformation,
 } from '../nonBiddingContracts/index';
 //合同类型
-type ContractsInformation = NonBiddingContractsInformation &
-  ReviewNonBiddingContractsInformation & { contractsID: string };
+type ContractsInformation = NonBiddingContractsInformation & ReviewNonBiddingContractsInformation;
 //合同存入数据库和区块链时，会生成一个唯一的合同ID的类型,因此加一个合同ID
 
 const BusinessOpportunitiesList = () => {
@@ -225,7 +224,7 @@ const BusinessOpportunitiesList = () => {
       key: 'submitTime',
     },
     {
-      title: '此客户全部基础信息',
+      title: '合同全部信息',
       key: 'allBasicInfo',
       render: (text: string, record: ContractsInformation) => (
         <Button type="primary" onClick={() => handleShowAllBasicInfo(record)}>

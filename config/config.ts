@@ -220,6 +220,12 @@ export default defineConfig({
           path: '/business/biddingInformation/review',
           component: './business/biddingInformation/review',
         },
+        {
+          name: '标书登记管理',
+          icon: 'smile',
+          path: '/business/biddingInformation/bidingDocument',
+          component: './business/biddingInformation/bidingDocument',
+        },
       ],
     },
     // {

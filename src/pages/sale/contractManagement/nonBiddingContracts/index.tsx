@@ -19,6 +19,7 @@ export type ReviewNonBiddingContractsInformation = {
   reviewResult: boolean; //审核结果,true为通过，false为不通过
   reviewRemarks: string; //审核备注
   reviewTime: string; //审核时间
+  contractsID: string; //合同ID,上传合同后，由后台与数据量生成唯一的合同ID
 };
 
 const ProjectApproval = () => {
@@ -172,6 +173,7 @@ const ProjectApproval = () => {
     //添加审核时间
     detail.reviewTime = new Date().toLocaleString();
     detail.reviewStatus = true; //表明已经审核，不管是否通过
+    detail.contractsID = '';
     //console.log(detail);
     fakeSubmitDetailForm(detail).then((res) => {
       if (res.data.message === 'Ok') {
@@ -329,6 +331,9 @@ const ProjectApproval = () => {
               </Form.Item>
               <Form.Item label="审核备注。" name="reviewRemarks">
                 <Input.TextArea />
+              </Form.Item>
+              <Form.Item label="合同存档" name="">
+                <Button>存档</Button>
               </Form.Item>
             </Form>
           </Modal>
