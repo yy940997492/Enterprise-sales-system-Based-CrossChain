@@ -1,32 +1,27 @@
-//标书上传
+//查看标书
 import { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, message, Card } from 'antd';
 const { Search } = Input;
 import { fakeSubmitDetailForm } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
-  BiddingBasicInformation,
-  ReviewBiddingInformation,
-} from '@/pages/business/biddingInformation/review/index';
+  BiddingDocumentInformation,
+  RegisterBiddingDocument,
+} from '@/pages/business/biddingInformation/bidingDocument/index';
 
 //商务部门制作标书基础信息，就是通过标书审核的信息
-export type BiddingDocumentInformation = BiddingBasicInformation & ReviewBiddingInformation; //标书上传信息
-
-//商务部门登记标书新增字段
-export type RegisterBiddingDocument = {
-  registerBiddingTime: string; //标书登记时间
-  biddingDocumentID: string; //标书编号，标书上传后，后后台和区块链生成的唯一标识
-};
+type ShowBiddingDocument = BiddingDocumentInformation & RegisterBiddingDocument; //标书上传信息
 
 const ProjectApproval = () => {
-  const [data, setData] = useState<BiddingDocumentInformation[]>([]); //保存完整的相应数据
-  const [searchData, setSearchData] = useState<BiddingDocumentInformation[]>([]); //保存查询的数据
+  const [data, setData] = useState<ShowBiddingDocument[]>([]); //保存完整的相应数据
+  const [searchData, setSearchData] = useState<ShowBiddingDocument[]>([]); //保存查询的数据
   const [open, setOpen] = useState<boolean>(false); //第一个open，控制第一个模态框的显示与隐藏，第一个模态框是用了显示填写详细信息的模态框。
   const [open02, setOpen02] = useState<boolean>(false); //第二个open，控制第二个模态框的显示与隐藏，第二个模态框是用来显示客户全部基础信息的模态框。
   const [detailForm] = Form.useForm();
-  const [basicInfo, setBasicInfo] = useState<BiddingDocumentInformation>({
+  const [basicInfo, setBasicInfo] = useState<ShowBiddingDocument>({
     projectID: '',
     customerID: '',
+    biddingDocumentID: '',
     address: '',
     birthdate: '',
     company: '',
@@ -53,6 +48,7 @@ const ProjectApproval = () => {
     reviewBiddingResult: false, //商务部门投标信息审核结果,true为通过，false为不通过
     reviewBiddingRemarks: '', //审核备注
     reviewBiddingTime: '', //审核时间
+    registerBiddingTime: '', //注册时间
   });
 
   const fetchCustomerList = () => {
@@ -61,6 +57,7 @@ const ProjectApproval = () => {
         {
           projectID: '001',
           customerID: '1',
+          biddingDocumentID: '0xda12312afh',
           name: '韩立',
           sex: '男',
           dateTime: '2021-01-01',
@@ -87,10 +84,12 @@ const ProjectApproval = () => {
           reviewBiddingResult: true, //商务部门投标信息审核结果,true为通过，false为不通过
           reviewBiddingRemarks: '同意投标', //审核备注
           reviewBiddingTime: '2021/3/2 17:54:12', //审核时间
+          registerBiddingTime: '2021/3/2 17:54:12', //注册时间
         },
         {
           projectID: '002',
           customerID: '2',
+          biddingDocumentID: '0xda12312afh',
           name: '南宫婉',
           sex: '女',
           dateTime: '2001-01-01',
@@ -117,10 +116,12 @@ const ProjectApproval = () => {
           reviewBiddingResult: true, //商务部门投标信息审核结果,true为通过，false为不通过
           reviewBiddingRemarks: '同意投标', //审核备注
           reviewBiddingTime: '2021/3/2 17:54:12', //审核时间
+          registerBiddingTime: '2021/3/2 17:54:12', //注册时间
         },
         {
           projectID: '003',
           customerID: '3',
+          biddingDocumentID: '0xda12312afh',
           name: '周明浩',
           sex: '男',
           dateTime: '1997-01-01',
@@ -147,6 +148,7 @@ const ProjectApproval = () => {
           reviewBiddingResult: true, //商务部门投标信息审核结果,true为通过，false为不通过
           reviewBiddingRemarks: '同意投标', //审核备注
           reviewBiddingTime: '2021/3/2 17:54:12', //审核时间
+          registerBiddingTime: '2021/3/2 17:54:12', //注册时间
         },
       ],
     };
@@ -160,15 +162,15 @@ const ProjectApproval = () => {
   }, []);
 
   //填写跟进信息，弹出模态框
-  const handleEnterDetailModal = (record: BiddingDocumentInformation) => {
-    //console.log(record);
-    //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
-    setBasicInfo(record);
-    setOpen(true);
-  };
+  // const handleEnterDetailModal = (record: ShowBiddingDocument) => {
+  //   //console.log(record);
+  //   //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
+  //   setBasicInfo(record);
+  //   setOpen(true);
+  // };
 
   //点击查看客户全部商机基础信息时，弹出的模态框
-  const handleShowAllBasicInfo = (record: BiddingDocumentInformation) => {
+  const handleShowAllBasicInfo = (record: ShowBiddingDocument) => {
     //console.log('rc',record);
     //setBasicInfo(Object.assign({},record));
     //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
@@ -178,7 +180,7 @@ const ProjectApproval = () => {
   //console.log('bi',basicInfo);
   //提交详细跟进信息
   const handleDetailFormSubmit = async (values: RegisterBiddingDocument) => {
-    const detail: RegisterBiddingDocument & BiddingDocumentInformation = {
+    const detail: RegisterBiddingDocument & ShowBiddingDocument = {
       ...basicInfo,
       ...values,
     };
@@ -221,6 +223,11 @@ const ProjectApproval = () => {
       key: 'customerID',
     },
     {
+      title: '标书编号',
+      dataIndex: 'biddingDocumentID',
+      key: 'biddingDocumentID',
+    },
+    {
       title: '客户姓名',
       dataIndex: 'name',
       key: 'name',
@@ -252,23 +259,11 @@ const ProjectApproval = () => {
       key: 'submitTime',
     },
     {
-      title: '立项详细信息',
+      title: '标书信息',
       key: 'allBasicInfo',
-      render: (text: string, record: BiddingDocumentInformation) => (
+      render: (text: string, record: ShowBiddingDocument) => (
         <Button type="primary" onClick={() => handleShowAllBasicInfo(record)}>
           查看
-        </Button>
-      ),
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (
-        text: string,
-        record: BiddingDocumentInformation, //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据。
-      ) => (
-        <Button type="primary" onClick={() => handleEnterDetailModal(record)}>
-          审核招标
         </Button>
       ),
     },
@@ -332,7 +327,7 @@ const ProjectApproval = () => {
           </Modal>
 
           <Modal
-            title="此客户全部基础信息"
+            title="此标书全部信息"
             open={open02}
             onCancel={() => setOpen02(false)}
             onOk={() => setOpen02(false)}

@@ -226,6 +226,12 @@ export default defineConfig({
           path: '/business/biddingInformation/bidingDocument',
           component: './business/biddingInformation/bidingDocument',
         },
+        {
+          name: '查看标书',
+          icon: 'smile',
+          path: '/business/biddingInformation/showBidingDocument',
+          component: './business/biddingInformation/showBidingDocument',
+        },
       ],
     },
     // {
