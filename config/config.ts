@@ -232,6 +232,12 @@ export default defineConfig({
           path: '/business/biddingInformation/showBidingDocument',
           component: './business/biddingInformation/showBidingDocument',
         },
+        {
+          name: '提交登记投标结果',
+          icon: 'smile',
+          path: '/business/biddingInformation/biddingResults',
+          component: './business/biddingInformation/biddingResults',
+        },
       ],
     },
     // {

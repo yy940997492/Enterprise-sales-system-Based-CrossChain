@@ -1,24 +1,27 @@
-//查看标书
+//标书上传
 import { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, message, Card } from 'antd';
+import { Table, Button, Modal, Form, Input, message, Card, Radio } from 'antd';
 const { Search } = Input;
 import { fakeSubmitDetailForm } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
-import {
-  BiddingDocumentInformation,
-  RegisterBiddingDocument,
-} from '@/pages/business/biddingInformation/bidingDocument/index';
+import { ShowBiddingDocument } from '@/pages/business/biddingInformation/showBidingDocument/index';
 
-//商务部门制作标书基础信息，就是通过标书审核的信息
-export type ShowBiddingDocument = BiddingDocumentInformation & RegisterBiddingDocument; //标书上传信息
+//通过的并且上传的标书
+export type ToSubmittedBidding = ShowBiddingDocument; //标书上传信息
+
+//提交标书投标结果新增字段
+export type BiddingResult = {
+  SubmittedBiddingResult: boolean; //记录标书投标结果
+  SubmittedBiddingTime: string; //记录标书投标时间
+};
 
 const ProjectApproval = () => {
-  const [data, setData] = useState<ShowBiddingDocument[]>([]); //保存完整的相应数据
-  const [searchData, setSearchData] = useState<ShowBiddingDocument[]>([]); //保存查询的数据
+  const [data, setData] = useState<ToSubmittedBidding[]>([]); //保存完整的相应数据
+  const [searchData, setSearchData] = useState<ToSubmittedBidding[]>([]); //保存查询的数据
   const [open, setOpen] = useState<boolean>(false); //第一个open，控制第一个模态框的显示与隐藏，第一个模态框是用了显示填写详细信息的模态框。
   const [open02, setOpen02] = useState<boolean>(false); //第二个open，控制第二个模态框的显示与隐藏，第二个模态框是用来显示客户全部基础信息的模态框。
   const [detailForm] = Form.useForm();
-  const [basicInfo, setBasicInfo] = useState<ShowBiddingDocument>({
+  const [basicInfo, setBasicInfo] = useState<ToSubmittedBidding>({
     projectID: '',
     customerID: '',
     biddingDocumentID: '',
@@ -162,15 +165,15 @@ const ProjectApproval = () => {
   }, []);
 
   //填写跟进信息，弹出模态框
-  // const handleEnterDetailModal = (record: ShowBiddingDocument) => {
-  //   //console.log(record);
-  //   //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
-  //   setBasicInfo(record);
-  //   setOpen(true);
-  // };
+  const handleEnterDetailModal = (record: ToSubmittedBidding) => {
+    //console.log(record);
+    //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
+    setBasicInfo(record);
+    setOpen(true);
+  };
 
   //点击查看客户全部商机基础信息时，弹出的模态框
-  const handleShowAllBasicInfo = (record: ShowBiddingDocument) => {
+  const handleShowAllBasicInfo = (record: ToSubmittedBidding) => {
     //console.log('rc',record);
     //setBasicInfo(Object.assign({},record));
     //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据
@@ -179,14 +182,13 @@ const ProjectApproval = () => {
   };
   //console.log('bi',basicInfo);
   //提交详细跟进信息
-  const handleDetailFormSubmit = async (values: RegisterBiddingDocument) => {
-    const detail: RegisterBiddingDocument & ShowBiddingDocument = {
+  const handleDetailFormSubmit = async (values: BiddingResult) => {
+    const detail: BiddingResult & ToSubmittedBidding = {
       ...basicInfo,
       ...values,
     };
     //添加提交时间
-    detail.registerBiddingTime = new Date().toLocaleString();
-    detail.biddingDocumentID = '';
+    detail.SubmittedBiddingTime = new Date().toLocaleString();
     //console.log(detail);
     fakeSubmitDetailForm(detail).then((res) => {
       if (res.data.message === 'Ok') {
@@ -223,11 +225,6 @@ const ProjectApproval = () => {
       key: 'customerID',
     },
     {
-      title: '标书编号',
-      dataIndex: 'biddingDocumentID',
-      key: 'biddingDocumentID',
-    },
-    {
       title: '客户姓名',
       dataIndex: 'name',
       key: 'name',
@@ -259,11 +256,23 @@ const ProjectApproval = () => {
       key: 'submitTime',
     },
     {
-      title: '标书信息',
+      title: '立项详细信息',
       key: 'allBasicInfo',
-      render: (text: string, record: ShowBiddingDocument) => (
+      render: (text: string, record: ToSubmittedBidding) => (
         <Button type="primary" onClick={() => handleShowAllBasicInfo(record)}>
           查看
+        </Button>
+      ),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (
+        text: string,
+        record: ToSubmittedBidding, //record是读取的CustomerBasicInformation类型全部的数据，即一个客户的全部基础数据。
+      ) => (
+        <Button type="primary" onClick={() => handleEnterDetailModal(record)}>
+          审核招标
         </Button>
       ),
     },
@@ -320,14 +329,26 @@ const ProjectApproval = () => {
               <Form.Item label="详细标书信息">
                 <Input value={basicInfo.projectApprovalDetail} disabled />
               </Form.Item>
-              <Form.Item label="上传标书" name="">
-                <Button>上传</Button>
+              <Form.Item
+                label="投标结果"
+                name="SubmittedBiddingResult"
+                rules={[
+                  {
+                    required: true,
+                    message: '请选择投标结果！',
+                  },
+                ]}
+              >
+                <Radio.Group buttonStyle="solid">
+                  <Radio.Button value={true}>中标</Radio.Button>
+                  <Radio.Button value={false}>流标</Radio.Button>
+                </Radio.Group>
               </Form.Item>
             </Form>
           </Modal>
 
           <Modal
-            title="此标书全部信息"
+            title="此客户全部基础信息"
             open={open02}
             onCancel={() => setOpen02(false)}
             onOk={() => setOpen02(false)}
